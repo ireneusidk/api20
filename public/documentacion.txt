@@ -5,3 +5,11 @@ Podemos añadir personajes, eliminarlos, editarlos y buscarlos por su id.
 La generacion del id es random. Si el id no coincide con ninguno entonces
 recibiremos una respuesta que dice Personaje no encontrado.
 Hay por defecto tres personajes:"Elara Firebrand", "Thorn Shadowblade", "Lyra Silverwind" que podemos verlos en formato JSON.
+
+ACTUALIZACION:
+En esta api vamos a tener como pantalla principal un html donde podemos elegir ver personajes de rick y morty,
+la documentacion de la api con cambios realizados hasta la ultima versión y un boton que nos llevará 
+a una tabla en la que agregaremos personajes editaremos o eliminaremos dependiendo lo que necesitemos hacer, los cuales
+se almacenarán en una base de datos en MONGODB. (Por ahora la función de imagen no está en funcionamiento pero está
+pendiente para poder agregar una imagen del personaje que queremos crear).
+Para modificar un personaje se despliega hacia abajo el nombre y la informacion del personaje que queremos editar.

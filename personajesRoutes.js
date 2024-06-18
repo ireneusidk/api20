@@ -5,7 +5,7 @@ const ejs = require("ejs");
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-const { mostrarTodo, agregar, eliminar } = require('./db.js');
+const { mostrarTodo, agregar, eliminar,actualizar,obtenerPersonajePorId } = require('./db.js');
 
 
 
@@ -30,13 +30,25 @@ El árbol, complacido por la pureza de su deseo, concedió su petición y le oto
 // router.get('/personajes', (req, res) => {
 //     res.json(personajesCreados);
 // });
+
+//1)//////////////////////////////////////////////////
+//  router.get('/personajes', async (req, res) => {
+//      const personajes = await mostrarTodo();
+//      // res.json(personajes);
+//      res.render('personajes',{personajes:personajes});
+//  });
+////////////////////////////////////////////////////////
+//funcion para ver los personajes
 router.get('/personajes', async (req, res) => {
-    const personajes = await mostrarTodo();
-    // res.json(personajes);
-    res.render('personajes',{personajes:personajes});
+    try {
+        const personajes = await mostrarTodo();
+        res.render('personajes', { personajes: personajes, personajeAModificar: null });
+    } catch (err) {
+        console.error('Error al obtener los personajes:', err);
+        res.status(500).send('Error interno del servidor');
+    }
 });
-
-
+/////////////////////////////////////////////////////////////
 // Obtener un personaje por su ID
 // router.get('/personajes:id', (req, res) => {
 //     const id = req.params.id;
@@ -47,8 +59,7 @@ router.get('/personajes', async (req, res) => {
 //         res.json(personaje);
 //     }
 // });
-
-
+/////////////////////////////////////////////////////////////
 // Crear un nuevo personaje
 // router.post('/personajes', (req, res) => {
 //     if (!req.body || !req.body.nombre || !req.body.descripcion || !req.body.imagen) {
@@ -75,6 +86,9 @@ router.get('/personajes', async (req, res) => {
 //         res.status(500).send('Error al agregar personaje');
 //     }
 // });
+
+
+//funcion para agregar un personaje nuevo
 router.post('/personajes', async (req, res) => {
     try {
         const { nombre, descripcion } = req.body;
@@ -91,6 +105,42 @@ router.post('/personajes', async (req, res) => {
         res.status(500).send('Error al agregar personaje');
     }
 });
+//funcion para obtener un personaje por su id y editarlo
+router.get('/personajes/:id/editar', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const personaje = await obtenerPersonajePorId(id);
+        const personajes = await mostrarTodo();
+        res.render('personajes', { personajes: personajes, personajeAModificar: personaje });
+    } catch (err) {
+        console.error('Error al obtener el personaje para editar:', err);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+//funcion que actualiza el personaje
+router.put('/personajes/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { nombre, descripcion } = req.body;
+        await actualizar(id, { nombre, descripcion });
+        res.redirect('/personajes');
+    } catch (err) {
+        console.error('Error al actualizar el personaje:', err);
+        res.status(500).send('Error al actualizar personaje');
+    }
+});
+// router.get('/personajes/:id/editar', async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const personaje = await obtenerPersonajePorId(id);
+//         res.render('personajes', { personajes: todosLosPersonajes, personajeAModificar: personaje });
+//     } catch (err) {
+//         console.error('Error al obtener el personaje para editar:', err);
+//         res.status(500).send('Error interno del servidor');
+//     }
+// });
+
+
 // Actualizar un personaje existente
 // router.put('/personajes/:id', (req, res) => {
 //     const id = req.params.id;
@@ -146,6 +196,7 @@ router.post('/personajes', async (req, res) => {
 // });
 
 
+//funcion que elimina un personaje por su id
 router.delete('/personajes/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -188,6 +239,7 @@ router.delete('/personajes/:id', async (req, res) => {
 //     res.json(favoritos);
 // });
 ///////////////////////////////////////////////////////////////////////////////////////
+//consumimos la api de rick y morty la cual se muestra mediante un link en el menu principal
  router.get('/personajes/establecidos', async (req, res) => {
      try {
          const response = await fetch('https://rickandmortyapi.com/api/character');
